@@ -12,7 +12,7 @@ from itertools import combinations
 def getYAMLFiles(path_to_dir):
     valid_  = [] 
     # initiate logging
-    logging.basicConfig(filename='forensics.log', filemode = 'a', format = '%(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
     logObj = logging.getLogger('getYAMLFilesLogger')
     # log warning
     logObj.warning('could contain corrupt files')
@@ -39,7 +39,7 @@ def getHelmTemplateContent( templ_dir ):
     template_content_dict = {}
     template_yaml_files =  getYAMLFiles( templ_dir )
     # initiate logging
-    logging.basicConfig(filename='forensics.log', filemode = 'a', format = '%(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
     logObj = logging.getLogger('getHelmTemplateContentLogger')
     # log warning
     logObj.warning('could include corrupt files')
@@ -56,7 +56,7 @@ def getMatchingTemplates(path2script, hierarchy_ls):
     template_content_dict, helm_string_list = {}, []
     templateDirOfHelmValues = os.path.dirname( path2script )  + constants.TEMPLATES_DIR_KW 
     # initiate logging
-    logging.basicConfig(filename='forensics.log', filemode = 'a', format = '%(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
     logObj = logging.getLogger('getMatchingTemplatesLogger')
     # log warning
     logObj.warning('could include corrupt values')
@@ -136,7 +136,7 @@ def mineSecretGraph( path2script, yaml_dict , secret_dict ):
 def getSHFiles(path_to_dir):
     valid_  = [] 
     # initiate logging
-    logging.basicConfig(filename='forensics.log', filemode = 'a', format = '%(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
     logObj = logging.getLogger('getSHFilesLogger')
     # log warning
     logObj.warning('could contain corrupt files')
@@ -165,7 +165,7 @@ def getTaintsFromConfigMaps( script_path ):
     script_name     = script_path.replace( config_map_dir, constants.YAML_SKIPPING_TEXT )
     sh_files = getSHFiles( config_map_dir )
     # initiate logging
-    logging.basicConfig(filename='forensics.log', filemode = 'a', format = '%(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
     logObj = logging.getLogger('getTaintsFromConfigMapsLogger')
     # log warning
     logObj.warning('could contain corrupt files')
