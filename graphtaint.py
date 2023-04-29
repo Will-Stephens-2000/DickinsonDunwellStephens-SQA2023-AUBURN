@@ -6,16 +6,26 @@ Construct taint graphs based on weakness types
 import constants
 import parser 
 import os 
+import logging
 from itertools import combinations
 
 def getYAMLFiles(path_to_dir):
     valid_  = [] 
+    # initiate logging
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
+    logObj = logging.getLogger('getYAMLFilesLogger')
+    # log warning
+    logObj.warning('could contain corrupt files')
     for root_, dirs, files_ in os.walk( path_to_dir ):
        for file_ in files_:
            full_p_file = os.path.join(root_, file_)
+           # log warning
+           logObj.warning('file could be corrupt')
            if(os.path.exists(full_p_file)):
              if (full_p_file.endswith( constants.YAML_EXTENSION  ) or full_p_file.endswith( constants.YML_EXTENSION  )  ):
                valid_.append(full_p_file)
+               # log warning
+               logObj.warning('file could be corrupt')
     return valid_ 
 
 def constructHelmString(hiera_tuple): 
@@ -28,8 +38,15 @@ def constructHelmString(hiera_tuple):
 def getHelmTemplateContent( templ_dir ):
     template_content_dict = {}
     template_yaml_files =  getYAMLFiles( templ_dir )
+    # initiate logging
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
+    logObj = logging.getLogger('getHelmTemplateContentLogger')
+    # log warning
+    logObj.warning('could include corrupt files')
     for template_yaml_file in template_yaml_files:
         value_as_str      = parser.readYAMLAsStr( template_yaml_file )
+        # log warning
+        logObj.warning('file could be corrupt')
         template_content_dict[template_yaml_file] = value_as_str
     return template_content_dict 
 
@@ -38,8 +55,15 @@ def getMatchingTemplates(path2script, hierarchy_ls):
     templ_list = [] 
     template_content_dict, helm_string_list = {}, []
     templateDirOfHelmValues = os.path.dirname( path2script )  + constants.TEMPLATES_DIR_KW 
+    # initiate logging
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
+    logObj = logging.getLogger('getMatchingTemplatesLogger')
+    # log warning
+    logObj.warning('could include corrupt values')
     if (os.path.exists( templateDirOfHelmValues )  ):
         template_content_dict = getHelmTemplateContent( templateDirOfHelmValues )
+        # log warning
+        logObj.warning('could include corrupt values')
     for hiera_ in hierarchy_ls:
         helm_string_list.append(   constructHelmString( hiera_  ) )
     for template_file, template_string in template_content_dict.items():
@@ -47,8 +71,12 @@ def getMatchingTemplates(path2script, hierarchy_ls):
             if helm_string != constants.YAML_SKIPPING_TEXT : 
                 if helm_string in template_string: 
                     match_count = template_string.count( helm_string  )
+                    # log warning
+                    logObj.warning('value could be corrupt')
                     for _ in range(match_count):
                         templ_list.append( (template_file, helm_string ) )
+                        # log warning
+                        logObj.warning('file could be corrupt')
     return templ_list
 
 def getValidTaints(  lis_template_matches ): 
@@ -107,12 +135,21 @@ def mineSecretGraph( path2script, yaml_dict , secret_dict ):
 
 def getSHFiles(path_to_dir):
     valid_  = [] 
+    # initiate logging
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
+    logObj = logging.getLogger('getSHFilesLogger')
+    # log warning
+    logObj.warning('could contain corrupt files')
     for root_, _, files_ in os.walk( path_to_dir ):
        for file_ in files_:
            full_p_file = os.path.join(root_, file_)
+           # log warning
+           logObj.warning('file could be corrpt')
            if(os.path.exists(full_p_file)):
              if (full_p_file.endswith( constants.SH_EXTENSION  )  ):
                valid_.append(full_p_file)
+               # log warning
+               logObj.warning('file could be corrupt')
     return valid_ 
 
 
@@ -127,10 +164,19 @@ def getTaintsFromConfigMaps( script_path ):
     config_map_dir  = os.path.dirname( script_path )  + constants.SLASH_SYMBOL    
     script_name     = script_path.replace( config_map_dir, constants.YAML_SKIPPING_TEXT )
     sh_files = getSHFiles( config_map_dir )
+    # initiate logging
+    logging.basicConfig(filename='forensics.log', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
+    logObj = logging.getLogger('getTaintsFromConfigMapsLogger')
+    # log warning
+    logObj.warning('could contain corrupt files')
     for sh_file in sh_files:
         sh_content = readBashAsStr( sh_file )
+        # log warning
+        logObj.warning('file could be corrupt')
         if script_name in sh_content:
             sh_match_cnt  = sh_content.count( script_name )
+            # log warning
+            logObj.warning('content could be corrupt')
             for l_ in range( sh_match_cnt ):
                 list2Return.append(  sh_file  )
     return list2Return
